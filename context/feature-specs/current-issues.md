@@ -1,1 +1,0 @@
-When I logout from profile. It is redirected to http://localhost:3000/ and blank page appears with just rendering button on bottom left. When I refresh the browser http://localhost:3000/sign-in opens up.
