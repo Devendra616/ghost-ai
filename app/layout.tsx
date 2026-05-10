@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+import { clerkAppearance } from "@/lib/clerk-appearance";
+
+const signInUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +33,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-base text-copy-primary">
-        {children}
+        <ClerkProvider appearance={clerkAppearance} afterSignOutUrl={signInUrl}>
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );
