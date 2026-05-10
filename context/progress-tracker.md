@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Editor Chrome
+- Authentication
 
 ## Current Goal
 
-- Editor chrome from `context/feature-specs/02-editor.md` is implemented, wired into a reusable layout, and verified.
+- Implement Clerk auth from `context/feature-specs/03-auth.md`: provider, auth pages, protected routes, root redirects, and editor user menu.
 
 ## Completed
 
@@ -22,6 +22,18 @@ Update this file whenever the current phase, active feature, or implementation s
 - Added `components/editor/editor-dialog-pattern.tsx` as the reusable dark-token dialog content pattern for future editor dialogs.
 - Added `components/editor/editor-layout.tsx` to compose the editor navbar and project sidebar around editor screen content.
 - Updated the home route to render inside the editor layout with a base canvas surface.
+- Installed `@clerk/ui` for Clerk's `dark` theme support.
+- Added `lib/clerk-appearance.ts` to map Clerk appearance variables to app CSS tokens.
+- Wrapped the root app with `ClerkProvider`.
+- Added protected-first Clerk `proxy.ts` with public `/`, sign-in, and sign-up routes.
+- Added `/sign-in` and `/sign-up` Clerk pages with the two-panel desktop auth layout and form-only mobile layout.
+- Tightened the auth page left panel to exactly match the spec: compact logo, tagline, and short text-only feature list.
+- Updated auth pages to better match the provided reference: 50/50 desktop split, richer left product panel, icon-backed text feature rows, and a distinct elevated right form panel.
+- Made auth shell and Clerk card font usage explicit through the app's Geist Sans token.
+- Moved the editor shell to `/editor` and changed `/` into an auth-aware redirect route.
+- Added Clerk `UserButton` to the editor navbar.
+- Added standard Clerk public URL and fallback redirect environment variables for `/sign-in`, `/sign-up`, and `/editor`.
+- Set Clerk's global post-sign-out URL to `/sign-in` so profile logout does not pause on the root redirect page.
 
 ## In Progress
 
@@ -41,6 +53,16 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Session Notes
 
+- Started `context/feature-specs/03-auth.md`: Clerk provider, auth routes, protected proxy, editor route, and user menu.
+- Completed `context/feature-specs/03-auth.md`.
+- Verification passed: `npm run lint` and `npm run build`.
+- Note: initial sandboxed build failed with Windows `spawn EPERM`; rerunning the same build with approved escalation passed.
+- Adjusted auth page layout to remove extra large-screen left-panel copy beyond the compact logo, tagline, and short feature list.
+- Verification passed after layout adjustment: `npm run lint` and `npm run build`.
+- Note: sandboxed build again failed with Windows `spawn EPERM`; rerunning with approved escalation passed.
+- Refined auth UI against the screenshot: equal-width panels, brighter product logo, larger left-side messaging, Lucide feature icons, and differentiated right-side form background.
+- Verification passed after screenshot-alignment pass: `npm run lint` and `npm run build`.
+- Note: sandboxed build again failed with Windows `spawn EPERM`; rerunning with approved escalation passed.
 - Completed `context/feature-specs/01-design-system.md`.
 - Verification passed: `npm run lint` and `npm run build`.
 - Started `context/feature-specs/02-editor.md`: editor navbar, floating project sidebar, and dialog pattern.
@@ -48,3 +70,4 @@ Update this file whenever the current phase, active feature, or implementation s
 - Verification passed: `npm run lint` and `npm run build`.
 - Note: initial sandboxed build failed with Windows `spawn EPERM`; rerunning the same build with approved escalation passed.
 - Wired editor navbar and project sidebar into `EditorLayout`, then used that layout on the home route.
+- Fixed profile logout redirect by configuring `ClerkProvider` with an explicit `afterSignOutUrl` derived from `NEXT_PUBLIC_CLERK_SIGN_IN_URL`, falling back to `/sign-in`.
