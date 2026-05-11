@@ -1,7 +1,27 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const signInUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in";
-const signUpUrl = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? "/sign-up";
+function normalizeClerkPath(value: string | undefined, fallback: string) {
+  const route = value ?? fallback;
+
+  if (!/^https?:\/\//i.test(route)) {
+    return route || "/";
+  }
+
+  try {
+    return new URL(route).pathname || "/";
+  } catch {
+    return route || "/";
+  }
+}
+
+const signInUrl = normalizeClerkPath(
+  process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+  "/sign-in"
+);
+const signUpUrl = normalizeClerkPath(
+  process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
+  "/sign-up"
+);
 
 const isPublicRoute = createRouteMatcher([
   "/",

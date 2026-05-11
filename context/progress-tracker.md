@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Authentication
+- Project Dialogs
 
 ## Current Goal
 
-- Implement Clerk auth from `context/feature-specs/03-auth.md`: provider, auth pages, protected routes, root redirects, and editor user menu.
+- Select the next feature spec or subsystem for implementation.
 
 ## Completed
 
@@ -34,6 +34,8 @@ Update this file whenever the current phase, active feature, or implementation s
 - Added Clerk `UserButton` to the editor navbar.
 - Added standard Clerk public URL and fallback redirect environment variables for `/sign-in`, `/sign-up`, and `/editor`.
 - Set Clerk's global post-sign-out URL to `/sign-in` so profile logout does not pause on the root redirect page.
+- Normalized Clerk sign-in and sign-up environment URLs to pathnames before building protected proxy public-route matchers.
+- Completed `context/feature-specs/04-project-dialogs.md` with editor home empty state, mock project dialogs, owned-project sidebar actions, and mobile sidebar scrim.
 
 ## In Progress
 
@@ -53,6 +55,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Session Notes
 
+- Fixed the `/editor` project sidebar tab layout so the tab list stacks above project cards, preventing the Shared tab content from overlapping owned projects.
+- Removed the redundant `Analytics Lakehouse` shared mock project from the sidebar data.
+- Started `context/feature-specs/04-project-dialogs.md`: project dialogs, editor home action, sidebar actions, and mobile sidebar scrim.
+- Completed `context/feature-specs/04-project-dialogs.md`.
+- Verification passed: `npm run lint` and `npm run build`.
 - Started `context/feature-specs/03-auth.md`: Clerk provider, auth routes, protected proxy, editor route, and user menu.
 - Completed `context/feature-specs/03-auth.md`.
 - Verification passed: `npm run lint` and `npm run build`.
@@ -71,3 +78,4 @@ Update this file whenever the current phase, active feature, or implementation s
 - Note: initial sandboxed build failed with Windows `spawn EPERM`; rerunning the same build with approved escalation passed.
 - Wired editor navbar and project sidebar into `EditorLayout`, then used that layout on the home route.
 - Fixed profile logout redirect by configuring `ClerkProvider` with an explicit `afterSignOutUrl` derived from `NEXT_PUBLIC_CLERK_SIGN_IN_URL`, falling back to `/sign-in`.
+- Fixed proxy public route matching when Clerk sign-in/sign-up env vars are configured as full URLs instead of pathnames.
