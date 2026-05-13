@@ -1,16 +1,18 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 function normalizeClerkPath(value: string | undefined, fallback: string) {
-  const route = value ?? fallback;
-
-  if (!/^https?:\/\//i.test(route)) {
-    return route || "/";
-  }
+  const raw = (value ?? "").trim();
+  if (!raw) return fallback;
 
   try {
-    return new URL(route).pathname || "/";
+    const pathname = /^https?:\/\//i.test(raw) ? new URL(raw).pathname : raw;
+    const normalized = pathname.startsWith("/") ? pathname : `/${pathname}`;
+    const cleaned = normalized.replace(/\/+$/, "") || "/";
+    return cleaned === "/" ? fallback : cleaned;
   } catch {
-    return route || "/";
+    return fallback;
+  }
+}
   }
 }
 
