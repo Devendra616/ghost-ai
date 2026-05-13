@@ -56,11 +56,16 @@ export function useProjectDialogs() {
     setProjectName("");
   }
 
-  function submitDialog() {
+  async function submitDialog() {
+    if (isLoading) return;
     setIsLoading(true);
-    setIsLoading(false);
-    setDialogState(null);
-    setProjectName("");
+    try {
+      // await create/rename/delete request here
+    } finally {
+      setIsLoading(false);
+      setDialogState(null);
+      setProjectName("");
+    }
   }
 
   return {
