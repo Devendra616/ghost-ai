@@ -4,7 +4,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Project Dialogs
+- Ready For Next Feature
 
 ## Current Goal
 
@@ -36,6 +36,8 @@ Update this file whenever the current phase, active feature, or implementation s
 - Set Clerk's global post-sign-out URL to `/sign-in` so profile logout does not pause on the root redirect page.
 - Normalized Clerk sign-in and sign-up environment URLs to pathnames before building protected proxy public-route matchers.
 - Completed `context/feature-specs/04-project-dialogs.md` with editor home empty state, mock project dialogs, owned-project sidebar actions, and mobile sidebar scrim.
+- Completed `context/feature-specs/05-prisma.md` with project data models, collaborator relations, Prisma client singleton, first migration, and generated Prisma client.
+- Fixed pre-existing stray closing braces in `app/page.tsx` and `proxy.ts` so lint/build verification could run.
 
 ## In Progress
 
@@ -55,6 +57,12 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Session Notes
 
+- Started `context/feature-specs/05-prisma.md`: project data models, Prisma client singleton, first migration, and build verification.
+- Added `prisma/models/project.prisma` with `Project`, `ProjectCollaborator`, and `ProjectStatus`.
+- Added `lib/prisma.ts` as a cached Prisma singleton with `prisma+postgres://` and direct PostgreSQL connection handling.
+- Created and applied migration `20260513022010_init_project_models`.
+- Verification passed: `npm run lint` and `npm run build`.
+- Note: initial sandboxed migration failed with an empty schema engine error; rerunning the same migration with approved database access passed.
 - Fixed the `/editor` project sidebar tab layout so the tab list stacks above project cards, preventing the Shared tab content from overlapping owned projects.
 - Removed the redundant `Analytics Lakehouse` shared mock project from the sidebar data.
 - Started `context/feature-specs/04-project-dialogs.md`: project dialogs, editor home action, sidebar actions, and mobile sidebar scrim.
