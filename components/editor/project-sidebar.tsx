@@ -1,33 +1,22 @@
 "use client";
 
 import { Pencil, Plus, Trash2, X } from "lucide-react";
+import Link from "next/link";
 
 import { useProjectDialogsContext } from "@/components/editor/project-dialogs-context";
-import type { MockProject } from "@/components/editor/use-project-dialogs";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import type { ProjectListItem } from "@/types/project";
 
 interface ProjectSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  activeProjectId?: string;
+  ownedProjects: ProjectListItem[];
+  sharedProjects: ProjectListItem[];
   className?: string;
 }
-
-const ownedProjects: MockProject[] = [
-  {
-    id: "payments-platform",
-    name: "Realtime Payment Platform",
-    ownerType: "owned",
-  },
-  {
-    id: "support-automation",
-    name: "Support Automation Mesh",
-    ownerType: "owned",
-  },
-];
-
-const sharedProjects: MockProject[] = [];
 
 function EmptyProjectsState() {
   return (
@@ -38,10 +27,11 @@ function EmptyProjectsState() {
 }
 
 interface ProjectListProps {
-  projects: MockProject[];
+  activeProjectId?: string;
+  projects: ProjectListItem[];
 }
 
-function ProjectList({ projects }: ProjectListProps) {
+function ProjectList({ activeProjectId, projects }: ProjectListProps) {
   const { openDeleteDialog, openRenameDialog } = useProjectDialogsContext();
 
   if (projects.length === 0) {
@@ -52,20 +42,24 @@ function ProjectList({ projects }: ProjectListProps) {
     <div className="space-y-2">
       {projects.map((project) => {
         const canManageProject = project.ownerType === "owned";
+        const isActive = project.id === activeProjectId;
 
         return (
           <div
             key={project.id}
-            className="group flex min-h-12 items-center justify-between gap-3 rounded-xl border border-surface-border bg-bg-elevated px-3 py-2"
+            className={cn(
+              "group flex min-h-12 items-center justify-between gap-3 rounded-xl border bg-bg-elevated px-3 py-2",
+              isActive ? "border-brand bg-accent-dim" : "border-surface-border"
+            )}
           >
-            <div className="min-w-0">
+            <Link href={`/editor/${project.id}`} className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-copy-primary">
                 {project.name}
               </p>
               <p className="text-xs text-copy-muted">
                 {canManageProject ? "Owned project" : "Shared project"}
               </p>
-            </div>
+            </Link>
 
             {canManageProject ? (
               <div className="flex shrink-0 items-center gap-1">
@@ -99,6 +93,9 @@ function ProjectList({ projects }: ProjectListProps) {
 export function ProjectSidebar({
   isOpen,
   onClose,
+  activeProjectId,
+  ownedProjects,
+  sharedProjects,
   className,
 }: ProjectSidebarProps) {
   const { openCreateDialog } = useProjectDialogsContext();
@@ -143,10 +140,10 @@ export function ProjectSidebar({
             <TabsTrigger value="shared">Shared</TabsTrigger>
           </TabsList>
           <TabsContent value="my-projects" className="mt-4 min-w-0">
-            <ProjectList projects={ownedProjects} />
+            <ProjectList activeProjectId={activeProjectId} projects={ownedProjects} />
           </TabsContent>
           <TabsContent value="shared" className="mt-4 min-w-0">
-            <ProjectList projects={sharedProjects} />
+            <ProjectList activeProjectId={activeProjectId} projects={sharedProjects} />
           </TabsContent>
         </Tabs>
 

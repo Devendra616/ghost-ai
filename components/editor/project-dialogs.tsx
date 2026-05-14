@@ -3,13 +3,13 @@
 import { AlertTriangle } from "lucide-react";
 
 import { EditorDialogPattern } from "@/components/editor/editor-dialog-pattern";
-import type { ProjectDialogsController } from "@/components/editor/use-project-dialogs";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import type { ProjectActionsController } from "@/hooks/use-project-actions";
 
 interface ProjectDialogsProps {
-  controller: ProjectDialogsController;
+  controller: ProjectActionsController;
 }
 
 export function ProjectDialogs({ controller }: ProjectDialogsProps) {
@@ -17,7 +17,7 @@ export function ProjectDialogs({ controller }: ProjectDialogsProps) {
     dialogState,
     isLoading,
     projectName,
-    slugPreview,
+    roomIdPreview,
     closeDialog,
     setProjectName,
     submitDialog,
@@ -61,8 +61,10 @@ export function ProjectDialogs({ controller }: ProjectDialogsProps) {
               />
             </label>
             <div className="rounded-xl border border-surface-border bg-bg-subtle px-3 py-2">
-              <p className="text-xs uppercase text-copy-faint">Slug preview</p>
-              <p className="mt-1 font-mono text-sm text-brand">{slugPreview}</p>
+              <p className="text-xs uppercase text-copy-faint">Room ID preview</p>
+              <p className="mt-1 break-all font-mono text-sm text-brand">
+                {roomIdPreview}
+              </p>
             </div>
           </form>
         </EditorDialogPattern>
@@ -127,7 +129,7 @@ export function ProjectDialogs({ controller }: ProjectDialogsProps) {
           <div className="flex items-start gap-3 rounded-2xl border border-state-error/40 bg-bg-subtle px-4 py-3 text-copy-secondary">
             <AlertTriangle className="mt-0.5 h-5 w-5 text-state-error" />
             <p className="text-sm">
-              This destructive action cannot be undone in this mock workspace.
+              This destructive action cannot be undone.
             </p>
           </div>
         </EditorDialogPattern>

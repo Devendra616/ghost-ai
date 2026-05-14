@@ -37,6 +37,8 @@ Update this file whenever the current phase, active feature, or implementation s
 - Normalized Clerk sign-in and sign-up environment URLs to pathnames before building protected proxy public-route matchers.
 - Completed `context/feature-specs/04-project-dialogs.md` with editor home empty state, mock project dialogs, owned-project sidebar actions, and mobile sidebar scrim.
 - Completed `context/feature-specs/05-prisma.md` with project data models, collaborator relations, Prisma client singleton, first migration, and generated Prisma client.
+- Completed `context/feature-specs/06-project-apis.md` with backend project list, create, rename, and delete routes.
+- Completed `context/feature-specs/07-wire-editor-home.md` with server-fetched editor projects and API-backed project actions.
 - Fixed pre-existing stray closing braces in `app/page.tsx` and `proxy.ts` so lint/build verification could run.
 
 ## In Progress
@@ -53,10 +55,25 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Architecture Decisions
 
-- Add decisions that affect the system design or data model.
+- Project API routes are exempted from proxy-level protection so they can return their specified JSON `401` responses; route handlers still enforce Clerk auth and owner checks before mutations.
 
 ## Session Notes
 
+- Started `context/feature-specs/07-wire-editor-home.md`: server-fetched project data and real create, rename, and delete actions.
+- Added server-side owned and shared project loading for `/editor` and `/editor/[projectId]`.
+- Added `hooks/use-project-actions.ts` for create, rename, and delete dialog state plus API mutations.
+- Wired the sidebar to real owned/shared project lists and workspace links.
+- Updated project dialogs to show room ID preview, pre-fill rename names, and show delete target names.
+- Updated project creation to accept a slug-based project ID so project IDs and room IDs stay aligned.
+- Completed `context/feature-specs/07-wire-editor-home.md`.
+- Verification passed: `npm run lint` and `npm run build`.
+- Started `context/feature-specs/06-project-apis.md`: backend project API routes for list, create, rename, and delete.
+- Added `GET /api/projects` and `POST /api/projects` for owned project listing and creation.
+- Added `PATCH /api/projects/[projectId]` and `DELETE /api/projects/[projectId]` with owner-only mutation checks.
+- Added request-body parsing helpers for project create/rename validation and default create names.
+- Updated the Clerk proxy public matcher for `/api/projects(.*)` so route handlers can return the spec-required `401` response.
+- Completed `context/feature-specs/06-project-apis.md`.
+- Verification passed: `npm run lint` and `npm run build`.
 - Started `context/feature-specs/05-prisma.md`: project data models, Prisma client singleton, first migration, and build verification.
 - Added `prisma/models/project.prisma` with `Project`, `ProjectCollaborator`, and `ProjectStatus`.
 - Added `lib/prisma.ts` as a cached Prisma singleton with `prisma+postgres://` and direct PostgreSQL connection handling.
