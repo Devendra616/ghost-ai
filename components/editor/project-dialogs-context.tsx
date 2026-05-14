@@ -2,13 +2,13 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 
-import type { ProjectDialogsController } from "@/components/editor/use-project-dialogs";
+import type { ProjectActionsController } from "@/hooks/use-project-actions";
 
-const ProjectDialogsContext = createContext<ProjectDialogsController | null>(null);
+const ProjectDialogsContext = createContext<ProjectActionsController | null>(null);
 
 interface ProjectDialogsProviderProps {
   children: ReactNode;
-  value: ProjectDialogsController;
+  value: ProjectActionsController;
 }
 
 export function ProjectDialogsProvider({

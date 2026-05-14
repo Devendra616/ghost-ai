@@ -6,6 +6,12 @@ import { EditorLayout } from "@/components/editor/editor-layout";
 import { listOwnedProjects, listSharedProjects } from "@/lib/projects";
 import type { ProjectListItem } from "@/types/project";
 
+interface ProjectWorkspacePageProps {
+  params: Promise<{
+    projectId: string;
+  }>;
+}
+
 function serializeProject(
   project: Awaited<ReturnType<typeof listOwnedProjects>>[number],
   ownerType: ProjectListItem["ownerType"]
@@ -33,17 +39,30 @@ async function getEditorProjects(userId: string) {
   };
 }
 
-export default async function EditorPage() {
+export default async function ProjectWorkspacePage({
+  params,
+}: ProjectWorkspacePageProps) {
   const { isAuthenticated, userId } = await auth();
 
   if (!isAuthenticated || !userId) {
     redirect(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? "/sign-in");
   }
 
+  const { projectId } = await params;
   const { ownedProjects, sharedProjects } = await getEditorProjects(userId);
+  const hasAccess =
+    ownedProjects.some((project) => project.id === projectId) ||
+    sharedProjects.some((project) => project.id === projectId);
 
+  if (!hasAccess) {
+    redirect("/editor");
+  }
   return (
-    <EditorLayout ownedProjects={ownedProjects} sharedProjects={sharedProjects}>
+    <EditorLayout
+      activeProjectId={projectId}
+      ownedProjects={ownedProjects}
+      sharedProjects={sharedProjects}
+    >
       <EditorHome />
     </EditorLayout>
   );
