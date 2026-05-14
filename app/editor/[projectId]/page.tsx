@@ -50,7 +50,13 @@ export default async function ProjectWorkspacePage({
 
   const { projectId } = await params;
   const { ownedProjects, sharedProjects } = await getEditorProjects(userId);
+  const hasAccess =
+    ownedProjects.some((project) => project.id === projectId) ||
+    sharedProjects.some((project) => project.id === projectId);
 
+  if (!hasAccess) {
+    redirect("/editor");
+  }
   return (
     <EditorLayout
       activeProjectId={projectId}
