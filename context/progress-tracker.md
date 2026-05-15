@@ -39,6 +39,7 @@ Update this file whenever the current phase, active feature, or implementation s
 - Completed `context/feature-specs/05-prisma.md` with project data models, collaborator relations, Prisma client singleton, first migration, and generated Prisma client.
 - Completed `context/feature-specs/06-project-apis.md` with backend project list, create, rename, and delete routes.
 - Completed `context/feature-specs/07-wire-editor-home.md` with server-fetched editor projects and API-backed project actions.
+- Completed `context/feature-specs/08-editor-workspace-shell.md` with server-side project access checks and the protected `/editor/[roomId]` workspace shell.
 - Fixed pre-existing stray closing braces in `app/page.tsx` and `proxy.ts` so lint/build verification could run.
 
 ## In Progress
@@ -59,6 +60,14 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Session Notes
 
+- Started `context/feature-specs/08-editor-workspace-shell.md`: protected workspace shell, access helper, AccessDenied state, and current-project layout.
+- Added `lib/project-access.ts` with Clerk identity lookup and owner/collaborator project access helpers.
+- Added `components/editor/access-denied.tsx` for missing or unauthorized workspace access.
+- Renamed the dynamic workspace route to `/editor/[roomId]` and added server-side auth, access checks, current project loading, and workspace context rendering.
+- Updated the editor navbar and layout to show the current project name, share action, AI sidebar toggle, active sidebar project, canvas placeholder, and right AI placeholder.
+- Completed `context/feature-specs/08-editor-workspace-shell.md`.
+- Verification passed: `npm run lint` and `npm run build`.
+- Note: cleared stale generated `.next/dev/types` after renaming the dynamic route from `[projectId]` to `[roomId]`.
 - Started `context/feature-specs/07-wire-editor-home.md`: server-fetched project data and real create, rename, and delete actions.
 - Added server-side owned and shared project loading for `/editor` and `/editor/[projectId]`.
 - Added `hooks/use-project-actions.ts` for create, rename, and delete dialog state plus API mutations.
