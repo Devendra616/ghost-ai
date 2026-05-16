@@ -6,6 +6,7 @@ import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectDialogs } from "@/components/editor/project-dialogs";
 import { ProjectDialogsProvider } from "@/components/editor/project-dialogs-context";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
+import { ShareDialog } from "@/components/editor/share-dialog";
 import { useProjectActions } from "@/hooks/use-project-actions";
 import { cn } from "@/lib/utils";
 import type { ProjectListItem } from "@/types/project";
@@ -13,6 +14,7 @@ import type { ProjectListItem } from "@/types/project";
 interface EditorLayoutProps {
   children: ReactNode;
   activeProjectId?: string;
+  activeProjectCanManage?: boolean;
   activeProjectName?: string;
   ownedProjects: ProjectListItem[];
   sharedProjects: ProjectListItem[];
@@ -22,6 +24,7 @@ interface EditorLayoutProps {
 export function EditorLayout({
   children,
   activeProjectId,
+  activeProjectCanManage = false,
   activeProjectName,
   ownedProjects,
   sharedProjects,
@@ -29,6 +32,7 @@ export function EditorLayout({
 }: EditorLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAiSidebarOpen, setIsAiSidebarOpen] = useState(true);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const projectActions = useProjectActions();
   const isWorkspace = Boolean(activeProjectName);
 
@@ -39,6 +43,7 @@ export function EditorLayout({
           isAiSidebarOpen={isAiSidebarOpen}
           isSidebarOpen={isSidebarOpen}
           onAiSidebarToggle={() => setIsAiSidebarOpen((current) => !current)}
+          onShareClick={() => setIsShareDialogOpen(true)}
           onSidebarToggle={() => setIsSidebarOpen((current) => !current)}
           projectName={activeProjectName}
         />
@@ -77,6 +82,14 @@ export function EditorLayout({
           )}
         </main>
         <ProjectDialogs controller={projectActions} />
+        {isShareDialogOpen ? (
+          <ShareDialog
+            canManage={activeProjectCanManage}
+            onOpenChange={setIsShareDialogOpen}
+            projectId={activeProjectId}
+            projectName={activeProjectName}
+          />
+        ) : null}
       </div>
     </ProjectDialogsProvider>
   );

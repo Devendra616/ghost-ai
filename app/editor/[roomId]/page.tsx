@@ -62,6 +62,7 @@ export default async function ProjectWorkspacePage({
 
   return (
     <EditorLayout
+      activeProjectCanManage={project.ownerId === identity.userId}
       activeProjectId={roomId}
       activeProjectName={project.name}
       ownedProjects={ownedProjects}

@@ -1,5 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 
+import { normalizeEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
 export interface ProjectIdentity {
@@ -29,7 +30,9 @@ export async function getCurrentProjectIdentity() {
 
   return {
     userId,
-    primaryEmail: user?.primaryEmailAddress?.emailAddress ?? null,
+    primaryEmail: user?.primaryEmailAddress?.emailAddress
+      ? normalizeEmail(user.primaryEmailAddress.emailAddress)
+      : null,
   } satisfies ProjectIdentity;
 }
 

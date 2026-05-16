@@ -1,3 +1,4 @@
+import { normalizeEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
 const projectSelect = {
@@ -27,7 +28,7 @@ export async function listSharedProjects(email: string, ownerId: string) {
       ownerId: { not: ownerId },
       collaborators: {
         some: {
-          email,
+          email: normalizeEmail(email),
         },
       },
     },

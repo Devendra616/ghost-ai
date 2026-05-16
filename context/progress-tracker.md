@@ -40,6 +40,9 @@ Update this file whenever the current phase, active feature, or implementation s
 - Completed `context/feature-specs/06-project-apis.md` with backend project list, create, rename, and delete routes.
 - Completed `context/feature-specs/07-wire-editor-home.md` with server-fetched editor projects and API-backed project actions.
 - Completed `context/feature-specs/08-editor-workspace-shell.md` with server-side project access checks and the protected `/editor/[roomId]` workspace shell.
+- Completed `context/feature-specs/09-share-dialog.md` with owner-only collaborator invite/remove APIs, Clerk profile enrichment, read-only collaborator access, and project-link copy feedback.
+- Fixed collaborator invites so Clerk profile enrichment falls back to email-only data instead of failing the share request, and normalized Clerk emails before collaborator access checks.
+- Tightened collaborator invites to require a registered Clerk user before creating project access.
 - Fixed pre-existing stray closing braces in `app/page.tsx` and `proxy.ts` so lint/build verification could run.
 
 ## In Progress
@@ -60,6 +63,17 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Session Notes
 
+- Started `context/feature-specs/09-share-dialog.md`: share dialog UI, collaborator APIs, and Clerk user enrichment.
+- Updated collaborator invites to verify the email exists in Clerk before adding access, returning a clear error for unregistered emails.
+- Verification passed after registered-user invite check: `npm run lint` and `npm run build`.
+- Fixed share dialog collaborator requests by making Clerk profile enrichment best-effort and centralizing collaborator email normalization.
+- Verification passed: `npm run lint` and `npm run build`.
+- Note: cleared stale generated `.next/dev/types` after a build type-check failure in generated route types.
+- Added collaborator listing, invite, and remove route handlers under `/api/projects/[projectId]/collaborators`.
+- Added `lib/project-collaborators.ts` for normalized email storage, collaborator serialization, and Clerk Backend API user enrichment.
+- Wired the editor navbar Share button to a dark share dialog with project-link copy feedback, owner-only invite/remove controls, and read-only shared-user access.
+- Completed `context/feature-specs/09-share-dialog.md`.
+- Verification passed: `npm run lint` and `npm run build`.
 - Started `context/feature-specs/08-editor-workspace-shell.md`: protected workspace shell, access helper, AccessDenied state, and current-project layout.
 - Added `lib/project-access.ts` with Clerk identity lookup and owner/collaborator project access helpers.
 - Added `components/editor/access-denied.tsx` for missing or unauthorized workspace access.
