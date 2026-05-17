@@ -125,9 +125,12 @@ export function ShareDialog({
 
   async function copyProjectLink() {
     if (!projectLink) return;
-
-    await navigator.clipboard.writeText(projectLink);
-    setIsCopied(true);
+    try {
+      await navigator.clipboard.writeText(projectLink);
+      setIsCopied(true);
+    } catch {
+      setError("Unable to copy project link.");
+    }
   }
 
   async function inviteCollaborator() {
