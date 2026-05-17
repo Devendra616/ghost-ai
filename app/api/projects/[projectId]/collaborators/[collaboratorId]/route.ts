@@ -41,7 +41,10 @@ export async function DELETE(
     return ownerError;
   }
 
-  await removeProjectCollaborator(projectId, collaboratorId);
+  const result = await removeProjectCollaborator(projectId, collaboratorId);
+  if (result.count === 0) {
+    return Response.json({ error: "Collaborator not found" }, { status: 404 });
+  }
 
   return Response.json({ success: true });
 }
