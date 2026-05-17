@@ -87,6 +87,10 @@ export function ShareDialog({
       return;
     }
 
+    setIsLoading(true);
+    setError(null);
+    setCollaborators([]);
+
     fetch(`/api/projects/${projectId}/collaborators`)
       .then(parseCollaboratorsResponse)
       .then((data) => {
