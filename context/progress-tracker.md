@@ -44,6 +44,9 @@ Update this file whenever the current phase, active feature, or implementation s
 - Fixed collaborator invites so Clerk profile enrichment falls back to email-only data instead of failing the share request, and normalized Clerk emails before collaborator access checks.
 - Tightened collaborator invites to require a registered Clerk user before creating project access.
 - Fixed pre-existing stray closing braces in `app/page.tsx` and `proxy.ts` so lint/build verification could run.
+- Completed `context/feature-specs/10-liveblock-setup.md` with typed Liveblocks presence/user metadata, cached node client, deterministic cursor colors, and the authenticated Liveblocks room token route.
+- Completed `context/feature-specs/11-base-canvas.md` with shared canvas types, a Liveblocks room wrapper, and a React Flow canvas synced through Liveblocks storage.
+- Completed `context/feature-specs/12-shape-panel.md` with the draggable shape toolbar, typed shape payloads, drop-to-create nodes, and a basic custom canvas node renderer.
 
 ## In Progress
 
@@ -60,9 +63,31 @@ Update this file whenever the current phase, active feature, or implementation s
 ## Architecture Decisions
 
 - Project API routes are exempted from proxy-level protection so they can return their specified JSON `401` responses; route handlers still enforce Clerk auth and owner checks before mutations.
+- The Liveblocks auth route is also exempted from proxy-level protection so it can return JSON `401`/`403` responses while enforcing Clerk auth and project access inside the route handler.
 
 ## Session Notes
 
+- Completed `context/feature-specs/12-shape-panel.md`.
+- Added default sizes and drag payload typing for all supported canvas shapes, including pentagon and rhombus.
+- Added a floating bottom shape panel with draggable icon buttons for rectangle, diamond, circle, pill, cylinder, pentagon, rhombus, and hexagon.
+- Added canvas dragover/drop handling that converts screen coordinates to React Flow coordinates and creates new `canvasNode` nodes with empty labels, default color, default size, and shape-based IDs.
+- Added a basic custom canvas node renderer so dropped nodes are visible as bordered rectangles with centered labels.
+- Updated `context/ui-context.md` to reflect the expanded eight-shape canvas palette.
+- Verification passed: `npm run lint` and `npm run build`.
+- Completed `context/feature-specs/11-base-canvas.md`.
+- Added `types/canvas.ts` with shared node data, node shape/color constants, and canvas node/edge types.
+- Added a Liveblocks-backed canvas room wrapper with initial cursor presence, suspense loading, and connection error fallback.
+- Replaced the workspace placeholder with a React Flow canvas using Liveblocks-synced nodes, edges, change handlers, loose connections, fit view, MiniMap, dot background, and collaborative cursors.
+- Verification passed: `npm run lint` and `npm run build`.
+- Started `context/feature-specs/11-base-canvas.md`: Liveblocks-backed React Flow canvas foundation.
+- Completed `context/feature-specs/10-liveblock-setup.md`.
+- Added `liveblocks.config.ts` typing for cursor presence, AI thinking state, and Liveblocks user metadata.
+- Added `lib/liveblocks.ts` with a cached Liveblocks node client and deterministic user cursor color helper.
+- Added `POST /api/liveblocks-auth` with Clerk auth, project access verification, private room creation via `getOrCreateRoom`, user metadata, and room-scoped session authorization.
+- Added missing `@liveblocks/node` dependency required for the server auth route.
+- Fixed the share dialog collaborator loading effect to satisfy the React hook lint rule without changing behavior.
+- Verification passed: `npm run lint` and `npm run build`.
+- Started `context/feature-specs/10-liveblock-setup.md`: Liveblocks config, cached node client, cursor color helper, and authenticated room token route.
 - Started `context/feature-specs/09-share-dialog.md`: share dialog UI, collaborator APIs, and Clerk user enrichment.
 - Updated collaborator invites to verify the email exists in Clerk before adding access, returning a clear error for unregistered emails.
 - Verification passed after registered-user invite check: `npm run lint` and `npm run build`.

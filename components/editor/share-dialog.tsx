@@ -87,29 +87,32 @@ export function ShareDialog({
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-    setCollaborators([]);
+    async function loadCollaborators() {
+      setIsLoading(true);
+      setError(null);
+      setCollaborators([]);
 
-    fetch(`/api/projects/${projectId}/collaborators`)
-      .then(parseCollaboratorsResponse)
-      .then((data) => {
+      try {
+        const response = await fetch(`/api/projects/${projectId}/collaborators`);
+        const data = await parseCollaboratorsResponse(response);
+
         if (!isCurrent) return;
         setCollaborators(data.collaborators);
         setServerCanManage(data.canManage);
-      })
-      .catch((loadError: unknown) => {
+      } catch (loadError) {
         if (!isCurrent) return;
         setError(
           loadError instanceof Error
             ? loadError.message
             : "Unable to load collaborators."
         );
-      })
-      .finally(() => {
+      } finally {
         if (!isCurrent) return;
         setIsLoading(false);
-      });
+      }
+    }
+
+    void loadCollaborators();
 
     return () => {
       isCurrent = false;
