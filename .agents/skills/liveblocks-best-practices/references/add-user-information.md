@@ -31,7 +31,7 @@ const { status, body } = await liveblocks.identifyUser(
       // Your custom metadata
       // ...
     },
-  }
+  },
 );
 ```
 
@@ -54,7 +54,7 @@ declare global {
 ```
 
 See the `authenticating-with-id-tokens` reference for more information on this
-recommedned authentication method. An alternative is to use access tokens, see
+recommended authentication method. An alternative is to use access tokens, see
 the `authenticating-with-access-tokens` reference for more information.
 
 ## Resolving users
@@ -94,9 +94,7 @@ function App() {
 }
 ```
 
-Users must be return in the same order they are passed. The array must be the
-same length as the `userIds` array. You can also return custom information, for
-example, a user’s `color`:
+Users must be returned in the same order they are passed. The array must be the same length as the `userIds` array. You can also return custom information, forexample, a user’s `color`:
 
 ```tsx
 import { LiveblocksProvider } from "@liveblocks/react/suspense";
@@ -162,8 +160,7 @@ function App() {
           // Show all workspace users by default
           return __getUserIds__(workspaceUsers);
         } else {
-          // Show users that match the current search (define your own logic for this, e.g. fuzzy search, )
-          const matchingUsers = __findUsers__(workspaceUsers, text);
+          // Show users that match the current search (define your own logic for this, e.g. fuzzy search)          const matchingUsers = __findUsers__(workspaceUsers, text);
           return __getUserIds__(matchingUsers);
         }
       }}

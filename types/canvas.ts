@@ -39,6 +39,11 @@ export const DEFAULT_NODE_SIZES = {
   hexagon: { width: 160, height: 112 },
 } as const satisfies Record<NodeShape, { width: number; height: number }>;
 
+export const MIN_NODE_SIZE = {
+  width: 80,
+  height: 56,
+} as const;
+
 export const SHAPE_DRAG_MIME_TYPE = "application/x-ghost-ai-shape";
 
 export interface CanvasShapeDragPayload {

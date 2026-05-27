@@ -61,9 +61,17 @@ export async function POST(request: Request) {
   const user = await currentUser();
   const liveblocks = getLiveblocksClient();
 
-  await liveblocks.getOrCreateRoom(roomId, {
-    defaultAccesses: [],
-  });
+  try {
+    await liveblocks.getOrCreateRoom(roomId, {
+      defaultAccesses: [],
+    });
+  } catch (error) {
+    console.error("Failed to create/get Liveblocks room:", error);
+    return Response.json(
+      { error: "Failed to initialize room" },
+      { status: 500 },
+    );
+  }
 
   const session = liveblocks.prepareSession(identity.userId, {
     userInfo: {
@@ -75,7 +83,14 @@ export async function POST(request: Request) {
 
   session.allow(roomId, session.FULL_ACCESS);
 
-  const { body, status } = await session.authorize();
-
-  return new Response(body, { status });
+  try {
+    const { body, status } = await session.authorize();
+    return new Response(body, { status });
+  } catch (error) {
+    console.error("Failed to authorize Liveblocks session:", error);
+    return Response.json(
+      { error: "Failed to authorize session" },
+      { status: 500 },
+    );
+  }
 }

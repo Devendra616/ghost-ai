@@ -47,6 +47,8 @@ Update this file whenever the current phase, active feature, or implementation s
 - Completed `context/feature-specs/10-liveblock-setup.md` with typed Liveblocks presence/user metadata, cached node client, deterministic cursor colors, and the authenticated Liveblocks room token route.
 - Completed `context/feature-specs/11-base-canvas.md` with shared canvas types, a Liveblocks room wrapper, and a React Flow canvas synced through Liveblocks storage.
 - Completed `context/feature-specs/12-shape-panel.md` with the draggable shape toolbar, typed shape payloads, drop-to-create nodes, and a basic custom canvas node renderer.
+- Completed `context/feature-specs/13-node-shape.md` with proper CSS/SVG node shape rendering and a cursor-following shape drag preview.
+- Completed `context/feature-specs/14-node-editing.md` with selected-node resizing, minimum dimensions, centered placeholder labels, and inline collaborative label editing.
 
 ## In Progress
 
@@ -67,6 +69,20 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Session Notes
 
+- Completed `context/feature-specs/14-node-editing.md`.
+- Added selected-node resize handles through React Flow `NodeResizer` with shared minimum node dimensions.
+- Added centered empty-label placeholder text and double-click inline textarea editing that updates node labels through `updateNodeData`.
+- Prevented textarea pointer and key interactions from dragging or panning the canvas, with editing closing on blur or `Escape`.
+- Verification passed: `npm run lint` and `npm run build`.
+- Started `context/feature-specs/14-node-editing.md`: canvas node resizing and inline label editing.
+- Fixed canvas node connection handles so selected-node dots render above the shape layer and shaped nodes no longer block handle pointer events.
+- Verification passed after handle fix: `npm run lint` and `npm run build`.
+- Completed `context/feature-specs/13-node-shape.md`.
+- Added `components/editor/node-shape-view.tsx` as the shared shape renderer for canvas nodes and drag previews.
+- Replaced the placeholder canvas node with CSS-rendered rectangle, circle, pill, and rhombus variants plus SVG-rendered diamond, pentagon, hexagon, and cylinder variants.
+- Added a cursor-following shape drag preview using the same shape type and default size as the drop payload, with cleanup on drop and drag end.
+- Verification passed: `npm run lint` and `npm run build`.
+- Started `context/feature-specs/13-node-shape.md`: proper canvas node shapes and shape drag preview.
 - Completed `context/feature-specs/12-shape-panel.md`.
 - Added default sizes and drag payload typing for all supported canvas shapes, including pentagon and rhombus.
 - Added a floating bottom shape panel with draggable icon buttons for rectangle, diamond, circle, pill, cylinder, pentagon, rhombus, and hexagon.

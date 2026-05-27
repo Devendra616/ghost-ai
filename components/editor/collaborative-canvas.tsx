@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent } from "react";
 
 import { Cursors, useLiveblocksFlow } from "@liveblocks/react-flow";
@@ -15,6 +15,7 @@ import {
 import type { ReactFlowInstance } from "@xyflow/react";
 
 import { CanvasNode as CanvasNodeRenderer } from "@/components/editor/canvas-node";
+import { NodeShapeView } from "@/components/editor/node-shape-view";
 import { ShapePanel } from "@/components/editor/shape-panel";
 import type { CanvasEdge, CanvasNode } from "@/types/canvas";
 import {
@@ -43,6 +44,14 @@ const nodeTypes = {
 };
 
 const nodeShapeSet = new Set<NodeShape>(NODE_SHAPES);
+
+interface ShapeDragPreviewState {
+  payload: CanvasShapeDragPayload;
+  position: {
+    x: number;
+    y: number;
+  };
+}
 
 function readShapeDragPayload(dataTransfer: DataTransfer): CanvasShapeDragPayload | null {
   const rawPayload = dataTransfer.getData(SHAPE_DRAG_MIME_TYPE);
@@ -76,6 +85,8 @@ function readShapeDragPayload(dataTransfer: DataTransfer): CanvasShapeDragPayloa
 export function CollaborativeCanvas() {
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance<CanvasNode, CanvasEdge> | null>(null);
+  const [shapeDragPreview, setShapeDragPreview] =
+    useState<ShapeDragPreviewState | null>(null);
   const nodeCounter = useRef(0);
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onDelete } =
     useLiveblocksFlow<CanvasNode, CanvasEdge>({
@@ -88,10 +99,62 @@ export function CollaborativeCanvas() {
       },
     });
 
+  useEffect(() => {
+    if (!shapeDragPreview) {
+      return;
+    }
+
+    function handleWindowDragOver(event: globalThis.DragEvent) {
+      setShapeDragPreview((current) => {
+        if (!current) {
+          return null;
+        }
+
+        return {
+          payload: current.payload,
+          position: {
+            x: event.clientX,
+            y: event.clientY,
+          },
+        };
+      });
+    }
+
+    function hidePreview() {
+      setShapeDragPreview(null);
+    }
+
+    window.addEventListener("dragover", handleWindowDragOver);
+    window.addEventListener("drop", hidePreview);
+    window.addEventListener("dragend", hidePreview);
+
+    return () => {
+      window.removeEventListener("dragover", handleWindowDragOver);
+      window.removeEventListener("drop", hidePreview);
+      window.removeEventListener("dragend", hidePreview);
+    };
+  }, [shapeDragPreview]);
+
   const handleDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
     if (Array.from(event.dataTransfer.types).includes(SHAPE_DRAG_MIME_TYPE)) {
       event.preventDefault();
       event.dataTransfer.dropEffect = "copy";
+
+      setShapeDragPreview((current) => {
+        const payload = current?.payload ?? readShapeDragPayload(event.dataTransfer);
+
+        if (!payload) {
+          return null;
+        }
+
+        return {
+          payload,
+          position: {
+            x: event.clientX,
+            y: event.clientY,
+          },
+        };
+      });
     }
   }, []);
 
@@ -106,6 +169,7 @@ export function CollaborativeCanvas() {
       const payload = readShapeDragPayload(event.dataTransfer);
 
       if (!payload) {
+        setShapeDragPreview(null);
         return;
       }
 
@@ -136,9 +200,24 @@ export function CollaborativeCanvas() {
       } satisfies CanvasNode;
 
       reactFlowInstance.addNodes(node);
+      setShapeDragPreview(null);
     },
     [reactFlowInstance],
   );
+
+  const handleShapeDragStart = useCallback(
+    (payload: CanvasShapeDragPayload, position: { x: number; y: number }) => {
+      setShapeDragPreview({
+        payload,
+        position,
+      });
+    },
+    [],
+  );
+
+  const handleShapeDragEnd = useCallback(() => {
+    setShapeDragPreview(null);
+  }, []);
 
   return (
     <div
@@ -175,7 +254,27 @@ export function CollaborativeCanvas() {
         />
         <Cursors />
       </ReactFlow>
-      <ShapePanel />
+      {shapeDragPreview ? (
+        <div
+          className="pointer-events-none fixed z-50 opacity-75"
+          style={{
+            height: shapeDragPreview.payload.size.height,
+            left: shapeDragPreview.position.x - shapeDragPreview.payload.size.width / 2,
+            top: shapeDragPreview.position.y - shapeDragPreview.payload.size.height / 2,
+            width: shapeDragPreview.payload.size.width,
+          }}
+        >
+          <NodeShapeView
+            color={NODE_COLORS[0]}
+            selected
+            shape={shapeDragPreview.payload.shape}
+          />
+        </div>
+      ) : null}
+      <ShapePanel
+        onShapeDragEnd={handleShapeDragEnd}
+        onShapeDragStart={handleShapeDragStart}
+      />
     </div>
   );
 }
