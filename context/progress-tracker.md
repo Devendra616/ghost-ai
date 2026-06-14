@@ -49,6 +49,8 @@ Update this file whenever the current phase, active feature, or implementation s
 - Completed `context/feature-specs/12-shape-panel.md` with the draggable shape toolbar, typed shape payloads, drop-to-create nodes, and a basic custom canvas node renderer.
 - Completed `context/feature-specs/13-node-shape.md` with proper CSS/SVG node shape rendering and a cursor-following shape drag preview.
 - Completed `context/feature-specs/14-node-editing.md` with selected-node resizing, minimum dimensions, centered placeholder labels, and inline collaborative label editing.
+- Completed `context/feature-specs/16-canvas-ergonomics.md` with bottom-left zoom/history controls, Liveblocks undo/redo, keyboard shortcuts, and minimap removal.
+- Completed `context/feature-specs/17-starter-template.md` with typed starter templates, preview modal, navbar entry point, and collaborative canvas replacement import.
 
 ## In Progress
 
@@ -69,6 +71,25 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Session Notes
 
+- Completed starter template thumbnail clarity pass: enlarged the preview viewport, made it fill each card, restored mini node labels, and increased edge contrast.
+- Verification passed: `npm run lint` and `npm run build`.
+- Started starter template thumbnail clarity pass: make previews show the full layout more clearly within each card.
+- Completed `context/feature-specs/17-starter-template.md`.
+- Added `components/editor/starter-templates.ts` with typed microservices, CI/CD pipeline, and event-driven system templates.
+- Added `components/editor/starter-templates-modal.tsx` with scrollable template cards, fixed-size calculated previews, and per-template import actions.
+- Added the editor navbar Templates entry point and wired it to the canvas starter template modal.
+- Added canvas import handling that deletes existing nodes and edges, adds the selected template through the React Flow/Liveblocks flow, and fits the view afterward.
+- Verification passed: `npm run lint` and `npm run build`.
+- Note: cleared stale generated `.next/dev/types` after a build type-check failure in generated route types.
+- Note: attempted to start the local dev server at `http://localhost:3000`; it logged ready once but did not remain listening in this shell environment.
+- Started `context/feature-specs/17-starter-template.md`: starter template library, import modal, navbar entry point, and canvas replacement flow.
+- Started `context/feature-specs/16-canvas-ergonomics.md`: bottom-left zoom/history controls and keyboard shortcuts.
+- Completed `context/feature-specs/16-canvas-ergonomics.md`.
+- Added `components/editor/canvas-control-bar.tsx` with zoom out, fit view, zoom in, undo, and redo controls.
+- Added `hooks/use-keyboard-shortcuts.ts` for zoom and Liveblocks history shortcuts while skipping editable fields.
+- Removed the React Flow minimap from the canvas.
+- Verification passed: `npm run lint` and `npm run build`.
+- Note: cleared stale generated `.next/dev/types` after a build type-check failure in generated route types.
 - Completed `context/feature-specs/14-node-editing.md`.
 - Added selected-node resize handles through React Flow `NodeResizer` with shared minimum node dimensions.
 - Added centered empty-label placeholder text and double-click inline textarea editing that updates node labels through `updateNodeData`.

@@ -4,19 +4,26 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent } from "react";
 
 import { Cursors, useLiveblocksFlow } from "@liveblocks/react-flow";
+import { useCanRedo, useCanUndo, useRedo, useUndo } from "@liveblocks/react";
 import {
   Background,
   BackgroundVariant,
   ConnectionMode,
   MarkerType,
-  MiniMap,
   ReactFlow,
 } from "@xyflow/react";
 import type { ReactFlowInstance } from "@xyflow/react";
 
 import { CanvasNode as CanvasNodeRenderer } from "@/components/editor/canvas-node";
+import { CanvasControlBar } from "@/components/editor/canvas-control-bar";
 import { NodeShapeView } from "@/components/editor/node-shape-view";
 import { ShapePanel } from "@/components/editor/shape-panel";
+import { StarterTemplatesModal } from "@/components/editor/starter-templates-modal";
+import {
+  OPEN_STARTER_TEMPLATES_EVENT,
+  type CanvasTemplate,
+} from "@/components/editor/starter-templates";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import type { CanvasEdge, CanvasNode } from "@/types/canvas";
 import {
   CANVAS_NODE_TYPE,
@@ -85,9 +92,14 @@ function readShapeDragPayload(dataTransfer: DataTransfer): CanvasShapeDragPayloa
 export function CollaborativeCanvas() {
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance<CanvasNode, CanvasEdge> | null>(null);
+  const [isStarterTemplatesOpen, setIsStarterTemplatesOpen] = useState(false);
   const [shapeDragPreview, setShapeDragPreview] =
     useState<ShapeDragPreviewState | null>(null);
   const nodeCounter = useRef(0);
+  const undo = useUndo();
+  const redo = useRedo();
+  const canUndo = useCanUndo();
+  const canRedo = useCanRedo();
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onDelete } =
     useLiveblocksFlow<CanvasNode, CanvasEdge>({
       suspense: true,
@@ -98,6 +110,36 @@ export function CollaborativeCanvas() {
         initial: [],
       },
     });
+
+  const handleUndo = useCallback(() => {
+    if (canUndo) {
+      undo();
+    }
+  }, [canUndo, undo]);
+
+  const handleRedo = useCallback(() => {
+    if (canRedo) {
+      redo();
+    }
+  }, [canRedo, redo]);
+
+  useKeyboardShortcuts({
+    reactFlowInstance,
+    onRedo: handleRedo,
+    onUndo: handleUndo,
+  });
+
+  useEffect(() => {
+    function openStarterTemplates() {
+      setIsStarterTemplatesOpen(true);
+    }
+
+    window.addEventListener(OPEN_STARTER_TEMPLATES_EVENT, openStarterTemplates);
+
+    return () => {
+      window.removeEventListener(OPEN_STARTER_TEMPLATES_EVENT, openStarterTemplates);
+    };
+  }, []);
 
   useEffect(() => {
     if (!shapeDragPreview) {
@@ -219,6 +261,45 @@ export function CollaborativeCanvas() {
     setShapeDragPreview(null);
   }, []);
 
+  const handleTemplateImport = useCallback(
+    async (template: CanvasTemplate) => {
+      if (!reactFlowInstance) {
+        return;
+      }
+
+      const nextNodes = template.nodes.map((node) => ({
+        ...node,
+        data: { ...node.data },
+        position: { ...node.position },
+        style: { ...node.style },
+      }));
+      const nextEdges = template.edges.map((edge) => ({
+        ...edge,
+        data: edge.data ? { ...edge.data } : edge.data,
+        markerEnd:
+          edge.markerEnd && typeof edge.markerEnd === "object"
+            ? { ...edge.markerEnd }
+            : edge.markerEnd,
+        style: edge.style ? { ...edge.style } : edge.style,
+      }));
+
+      await reactFlowInstance.deleteElements({
+        edges,
+        nodes,
+      });
+      reactFlowInstance.addNodes(nextNodes);
+      reactFlowInstance.addEdges(nextEdges);
+
+      window.requestAnimationFrame(() => {
+        reactFlowInstance.fitView({
+          duration: 240,
+          padding: 0.2,
+        });
+      });
+    },
+    [edges, nodes, reactFlowInstance],
+  );
+
   return (
     <div
       className="relative h-full min-h-[calc(100vh-3.5rem)] bg-base"
@@ -238,14 +319,6 @@ export function CollaborativeCanvas() {
         onNodesChange={onNodesChange}
         nodeTypes={nodeTypes}
       >
-        <MiniMap
-          maskColor="rgba(8, 8, 9, 0.7)"
-          nodeColor="var(--bg-subtle)"
-          nodeStrokeColor="var(--border-subtle)"
-          pannable
-          position="bottom-left"
-          zoomable
-        />
         <Background
           color="var(--border-default)"
           gap={24}
@@ -254,6 +327,13 @@ export function CollaborativeCanvas() {
         />
         <Cursors />
       </ReactFlow>
+      <CanvasControlBar
+        canRedo={canRedo}
+        canUndo={canUndo}
+        onRedo={handleRedo}
+        onUndo={handleUndo}
+        reactFlowInstance={reactFlowInstance}
+      />
       {shapeDragPreview ? (
         <div
           className="pointer-events-none fixed z-50 opacity-75"
@@ -274,6 +354,11 @@ export function CollaborativeCanvas() {
       <ShapePanel
         onShapeDragEnd={handleShapeDragEnd}
         onShapeDragStart={handleShapeDragStart}
+      />
+      <StarterTemplatesModal
+        open={isStarterTemplatesOpen}
+        onImport={handleTemplateImport}
+        onOpenChange={setIsStarterTemplatesOpen}
       />
     </div>
   );

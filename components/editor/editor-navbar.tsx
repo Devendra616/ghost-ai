@@ -3,6 +3,7 @@
 import { UserButton } from "@clerk/nextjs";
 import {
   Bot,
+  LayoutTemplate,
   PanelLeftClose,
   PanelLeftOpen,
   PanelRightClose,
@@ -10,6 +11,7 @@ import {
   Share2,
 } from "lucide-react";
 
+import { OPEN_STARTER_TEMPLATES_EVENT } from "@/components/editor/starter-templates";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +37,9 @@ export function EditorNavbar({
   const SidebarIcon = isSidebarOpen ? PanelLeftClose : PanelLeftOpen;
   const AiSidebarIcon = isAiSidebarOpen ? PanelRightClose : PanelRightOpen;
   const showWorkspaceActions = Boolean(projectName);
+  const openStarterTemplates = () => {
+    window.dispatchEvent(new CustomEvent(OPEN_STARTER_TEMPLATES_EVENT));
+  };
 
   return (
     <header
@@ -70,6 +75,16 @@ export function EditorNavbar({
       <div className="flex items-center justify-end gap-2">
         {showWorkspaceActions ? (
           <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label="Open starter templates"
+              onClick={openStarterTemplates}
+            >
+              <LayoutTemplate className="h-4 w-4" />
+              Templates
+            </Button>
             <Button
               type="button"
               variant="ghost"

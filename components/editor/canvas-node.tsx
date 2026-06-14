@@ -8,8 +8,12 @@ import type { NodeProps } from "@xyflow/react";
 
 import { NodeShapeView } from "@/components/editor/node-shape-view";
 import { cn } from "@/lib/utils";
-import { MIN_NODE_SIZE } from "@/types/canvas";
-import type { CanvasEdge, CanvasNode as CanvasNodeType } from "@/types/canvas";
+import { MIN_NODE_SIZE, NODE_COLORS } from "@/types/canvas";
+import type {
+  CanvasEdge,
+  CanvasNode as CanvasNodeType,
+  NodeColor,
+} from "@/types/canvas";
 
 const handleClassName =
   "!z-30 !size-3 !border !border-bg-base !bg-copy-primary opacity-0 shadow-md transition-opacity group-hover:opacity-100";
@@ -24,9 +28,19 @@ function stopCanvasInteraction(event: PointerEvent<HTMLTextAreaElement>) {
 
 export function CanvasNode({ data, id, selected }: NodeProps<CanvasNodeType>) {
   const [isEditing, setIsEditing] = useState(false);
+  const [hoveredColorFill, setHoveredColorFill] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { updateNodeData } = useReactFlow<CanvasNodeType, CanvasEdge>();
   const handleVisibilityClassName = selected ? "!opacity-100" : "";
+
+  const handleColorChange = useCallback(
+    (color: NodeColor) => {
+      updateNodeData(id, {
+        color,
+      });
+    },
+    [id, updateNodeData],
+  );
 
   useEffect(() => {
     if (!isEditing) {
@@ -50,15 +64,18 @@ export function CanvasNode({ data, id, selected }: NodeProps<CanvasNodeType>) {
     [id, updateNodeData],
   );
 
-  const handleLabelKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
-    event.stopPropagation();
+  const handleLabelKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLTextAreaElement>) => {
+      event.stopPropagation();
 
-    if (event.key === "Escape") {
-      event.preventDefault();
-      setIsEditing(false);
-      textareaRef.current?.blur();
-    }
-  }, []);
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsEditing(false);
+        textareaRef.current?.blur();
+      }
+    },
+    [],
+  );
 
   return (
     <div className="group relative h-full w-full outline-none">
@@ -78,6 +95,53 @@ export function CanvasNode({ data, id, selected }: NodeProps<CanvasNodeType>) {
         selected={selected}
         shape={data.shape}
       />
+      {selected ? (
+        <div className="absolute left-1/2 top-0 z-20 flex -translate-x-1/2 -translate-y-full gap-2 rounded-full border border-border-subtle bg-bg-default/95 p-2 shadow-2xl shadow-black/20 backdrop-blur-sm">
+          {NODE_COLORS.map((colorOption) => {
+            const isActive =
+              colorOption.fill === data.color.fill &&
+              colorOption.text === data.color.text;
+
+            const boxShadow = isActive
+              ? `0 0 0 3px ${colorOption.text}`
+              : hoveredColorFill === colorOption.fill
+                ? `0 0 0 8px ${colorOption.text}`
+                : undefined;
+
+            return (
+              <button
+                key={colorOption.fill}
+                type="button"
+                aria-label={`Set node color to ${colorOption.fill}`}
+                className={cn(
+                  "h-8 w-8 rounded-full border transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                  !isActive && "border-border-subtle",
+                )}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleColorChange(colorOption);
+                }}
+                onPointerDown={(event) => event.stopPropagation()}
+                onPointerMove={(event) => event.stopPropagation()}
+                onPointerEnter={(event) => {
+                  event.stopPropagation();
+                  setHoveredColorFill(colorOption.fill);
+                }}
+                onPointerLeave={(event) => {
+                  event.stopPropagation();
+                  setHoveredColorFill(null);
+                }}
+                style={{
+                  backgroundColor: colorOption.fill,
+                  color: colorOption.text,
+                  borderColor: isActive ? colorOption.text : undefined,
+                  boxShadow,
+                }}
+              />
+            );
+          })}
+        </div>
+      ) : null}
       {isEditing ? (
         <textarea
           ref={textareaRef}
