@@ -25,6 +25,7 @@ const signUpUrl = normalizeClerkPath(
 
 const isPublicRoute = createRouteMatcher([
   "/",
+  "/api/liveblocks-auth",
   "/api/projects(.*)",
   `${signInUrl}(.*)`,
   `${signUpUrl}(.*)`,
